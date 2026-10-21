@@ -19,7 +19,7 @@ def parse_card(code):
 
 
 def calculate_win_rates(player1_cards, player2_cards, community_cards):
-    #真実の勝率計算はまだ作ってない、ここではただ勝つなら100%を表示する
+    # 実際の勝率計算はまだ実装していないため、現時点では勝者の勝率を100%として表示する
     result = compare_set(
         player1_cards + community_cards, player2_cards + community_cards
     )
@@ -66,11 +66,17 @@ def compare():
         return jsonify(error=str(exc)), 400
 
     if any(code is None for hand in players for code in hand):
-        return jsonify(ready=False, message="请先给两位玩家各选择两张底牌。")
+        return jsonify(
+            ready=False,
+            message="両プレイヤーのホールカードをそれぞれ2枚選択してください。",
+        )
 
     board_count = sum(code is not None for code in community)
     if board_count not in (0, 3, 4, 5):
-        return jsonify(ready=False, message="公共牌需要是 0、3、4 或 5 张，才能比较。")
+        return jsonify(
+            ready=False,
+            message="比較するには、コミュニティカードが0枚、3枚、4枚、または5枚である必要があります。",
+        )
 
     p1 = [parse_card(code) for code in players[0]]
     p2 = [parse_card(code) for code in players[1]]
@@ -80,17 +86,25 @@ def compare():
         rate1, rate2 = calculate_win_rates(p1, p2, board)
     except Exception:
         app.logger.exception("Unable to compare the current cards")
-        return jsonify(error="比较失败，请检查牌型计算代码。"), 500
+        return (
+            jsonify(error="比較に失敗しました。役の判定処理を確認してください。"),
+            500,
+        )
 
     if not (0 <= rate1 <= 100 and 0 <= rate2 <= 100):
-        return jsonify(error="胜率函数应返回 0～100 的百分数。"), 500
+        return (
+            jsonify(
+                error="勝率計算関数は0～100の範囲のパーセンテージを返す必要があります。"
+            ),
+            500,
+        )
 
     if rate1 > rate2:
-        message = "当前牌面：Player 1 领先（非真实胜率）"
+        message = "現在の役：Player 1 がリードしています（実際の勝率ではありません）"
     elif rate2 > rate1:
-        message = "当前牌面：Player 2 领先（非真实胜率）"
+        message = "現在の役：Player 2 がリードしています（実際の勝率ではありません）"
     else:
-        message = "当前牌面：平局（或胜率相等）"
+        message = "現在の役：引き分け（または勝率が同じ）"
     return jsonify(ready=True, player1=rate1, player2=rate2, message=message)
 
 
