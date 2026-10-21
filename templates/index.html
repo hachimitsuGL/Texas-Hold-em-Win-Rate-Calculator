@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Texas Hold'em</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+  <main>
+    <h1>Texas Hold'em</h1>
+
+    <h2>コミュニティカード</h2>
+    <section id="community" class="card-row" aria-label="コミュニティカード"></section>
+
+    <h2>プレイヤー</h2>
+    <section class="player-row">
+      <div class="player-box">
+        <div class="player-name">プレイヤー1</div>
+        <div id="player1" class="card-row"></div>
+      </div>
+      <div class="player-box">
+        <div class="player-name">プレイヤー2</div>
+        <div id="player2" class="card-row"></div>
+      </div>
+    </section>
+
+    <section class="results" aria-label="勝率比較結果">
+      <h2>勝率</h2>
+      <div class="rate-row">
+        <span class="rate-label">プレイヤ1</span>
+        <div class="progress"><div id="fill1" class="progress-fill"></div></div>
+        <strong id="rate1" class="rate-value">--</strong>
+      </div>
+      <div class="rate-row">
+        <span class="rate-label">プレイヤ2</span>
+        <div class="progress"><div id="fill2" class="progress-fill"></div></div>
+        <strong id="rate2" class="rate-value">--</strong>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="card-dialog" aria-label="カード選択">
+    <div class="dialog-heading">
+      <h2>カードを選択</h2>
+      <button type="button" id="close-dialog">閉じる</button>
+    </div>
+    <div id="card-picker" class="picker"></div>
+    <div class="dialog-actions">
+      <button type="button" id="clear-slot">このカードをクリア</button>
+    </div>
+  </dialog>
+</body>
+</html>
