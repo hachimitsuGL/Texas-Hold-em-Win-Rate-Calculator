@@ -218,6 +218,7 @@ def hand_value(cards, hand_type):
         reverse=True
     ))
 
+# if set1 win return 1;elif set2 win return -1;else return 0
 def compare_set(set1, set2):
     cards1, type1 = max_combin(set1)
     cards2, type2 = max_combin(set2)

@@ -2,6 +2,7 @@
 
 from flask import Flask, jsonify, render_template, request
 from Texas_winrate import Card, RANKS, compare_set
+from itertools import combinations
 
 app = Flask(__name__)
 
@@ -18,8 +19,63 @@ def parse_card(code):
     return Card(SUIT_CODES[suit], rank)
 
 
+# def give_next_unknowncard(knowncards,current_card):
+#     while(True):
+#         if current_card==None:
+#             current_card.suit(SUIT_CODES[0])
+#             current_card.rank(RANKS[0])
+#         elif current_card.suit==SUIT_CODES[3] and current_card.rank==SUIT_CODES[12]:
+#             return False
+#         else:
+#             if(current_card.rank!="A"):
+#                 current_card.rank = RANKS[RANKS.index(current_card.rank) + 1]
+#             if(current_card.suit!="C"):
+#                 current_card.rank = RANKS[0]
+#                 current_card.suit= SUIT_CODES[SUIT_CODES.index(current_card.suit)+1]
+
+#         if current_card in knowncards:
+#             continue
+
+#         return current_card
+
+
 def calculate_win_rates(player1_cards, player2_cards, community_cards):
     # 実際の勝率計算はまだ実装していないため、現時点では勝者の勝率を100%として表示する
+    if len(community_cards) < 5:
+
+        unknowncard_count = 5 - len(community_cards)
+        knowncards = player1_cards + player2_cards + community_cards
+
+        known_values = {(card.suit, card.rank) for card in knowncards}
+
+        deck = [
+            Card(suit, rank)
+            for suit in SUIT_CODES.values()
+            for rank in RANKS
+            if (suit, rank) not in known_values
+        ]
+        ply1_wins = 0
+        ply2_wins = 0
+        draw = 0
+        for unknowncards in combinations(deck, unknowncard_count):
+            result = compare_set(
+                player1_cards + community_cards + list(unknowncards),
+                player2_cards + community_cards + list(unknowncards),
+            )
+            if result == 1:
+                ply1_wins += 1
+            elif result == -1:
+                ply2_wins += 1
+            else:
+                draw += 1
+
+        compare_count = ply1_wins + ply2_wins + draw
+        drawrate = draw / compare_count
+        return (
+            round((ply1_wins / compare_count + drawrate / 2) * 100, 2),
+            round((ply2_wins / compare_count + drawrate / 2) * 100, 2),
+        )
+
     result = compare_set(
         player1_cards + community_cards, player2_cards + community_cards
     )
